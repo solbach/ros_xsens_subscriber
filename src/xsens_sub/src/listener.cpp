@@ -1,16 +1,58 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include "sensor_msgs/Imu.h"
+//#include "geometry_msgs/TwistStamped.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+
+int first = 0;
+std::ofstream myfile;
 
 /**
  * This tutorial demonstrates simple receipt of messages over the ROS system.
  */
-void chatterCallback(const std_msgs::String::ConstPtr& msg)
+/*void chatterCallback2(const geometry_msgs::TwistStamped::ConstPtr& msg)
 {
-  ROS_INFO("I heard: [%s]", msg->data.c_str());
+  ROS_INFO("Angular X = [%f]", msg->twist.angular.x);
+  ROS_INFO("Angular Y = [%f]", msg->twist.angular.y);
+  ROS_INFO("Angular Z = [%f]", msg->twist.angular.z);
+
+  ROS_INFO("Linear X = [%f]", msg->twist.linear.x);
+  ROS_INFO("Linear Y = [%f]", msg->twist.linear.x);
+  ROS_INFO("Linear Z = [%f]", msg->twist.linear.x);
+
+}*/
+
+void chatterCallback(const sensor_msgs::Imu::ConstPtr& msg)
+{
+  double aX = msg->angular_velocity.x;
+  double aY = msg->angular_velocity.y;
+  double aZ = msg->angular_velocity.z;
+
+  double lX = msg->linear_acceleration.x;
+  double lY = msg->linear_acceleration.y;
+  double lZ = msg->linear_acceleration.z;
+
+  std::string a = std::to_string(42);
+
+  myfile << a;
+
+  ROS_INFO("Angular X = [%f]", msg->angular_velocity.x);
+  ROS_INFO("Angular Y = [%f]", msg->angular_velocity.y);
+  ROS_INFO("Angular Z = [%f]", msg->angular_velocity.z);
+
+  ROS_INFO("Linear X = [%f]", msg->linear_acceleration.x);
+  ROS_INFO("Linear Y = [%f]", msg->linear_acceleration.y);
+  ROS_INFO("Linear Z = [%f]", msg->linear_acceleration.z);
+
+  ros::Duration(1).sleep();
+
 }
 
 int main(int argc, char **argv)
 {
+  ROS_INFO("%s", "Starting MAIN");
   /**
    * The ros::init() function needs to see argc and argv so that it can perform
    * any ROS arguments and name remapping that were provided at the command line. For programmatic
@@ -30,6 +72,11 @@ int main(int argc, char **argv)
    */
   ros::NodeHandle n;
 
+  ROS_INFO("%s", "opening");
+  myfile.open("exampleros.txt");
+  ROS_INFO("%s", "Write");
+  myfile << "Writing this to a file.\n";
+
   /**
    * The subscribe() call is how you tell ROS that you want to receive messages
    * on a given topic.  This invokes a call to the ROS
@@ -45,7 +92,11 @@ int main(int argc, char **argv)
    * is the number of messages that will be buffered up before beginning to throw
    * away the oldest ones.
    */
-  ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);
+  //ros::Subscriber sub2 = n.subscribe("velocity", 1000, chatterCallback2);
+  ros::Subscriber sub = n.subscribe("imu/data", 1000, chatterCallback);
+
+  ROS_INFO("%s", "close");
+  myfile.close();
 
   /**
    * ros::spin() will enter a loop, pumping callbacks.  With this version, all

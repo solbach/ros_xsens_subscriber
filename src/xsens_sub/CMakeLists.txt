@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(xsens_sub)
 
+## Set Compiler Flag
+set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -8,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  geometry_msgs	
+  genmsg
 )
 
 ## System dependencies are found with CMake's conventions
@@ -103,16 +108,19 @@ include_directories(
 # )
 
 ## Declare a cpp executable
-# add_executable(xsens_sub_node src/xsens_sub_node.cpp)
-
+add_executable(xsens_listen src/listener.cpp)
+add_executable(xsens_pub src/publisher.cpp)
+target_link_libraries(xsens_pub
+   ${catkin_LIBRARIES}
+)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(xsens_sub_node xsens_sub_generate_messages_cpp)
+add_dependencies(xsens_listen xsens_listen_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(xsens_sub_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(xsens_listen
+   ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
