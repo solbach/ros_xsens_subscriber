@@ -30,26 +30,28 @@ void chatterCallback(const sensor_msgs::Imu::ConstPtr& msg)
   double aX = msg->angular_velocity.x;
   double aY = msg->angular_velocity.y;
   double aZ = msg->angular_velocity.z;
-
   double lX = msg->linear_acceleration.x;
   double lY = msg->linear_acceleration.y;
   double lZ = msg->linear_acceleration.z;
 
   ROS_INFO("Stamp sec= [%d]", msg->header.stamp.sec);
   ROS_INFO("Stamp nsec= [%d]", msg->header.stamp.nsec);
-  ROS_INFO("Angular X = [%f]", msg->angular_velocity.x);
-  ROS_INFO("Angular Y = [%f]", msg->angular_velocity.y);
-  ROS_INFO("Angular Z = [%f]", msg->angular_velocity.z);
+  ROS_INFO("Linear X = [%f]", lX);
+  ROS_INFO("Linear Y = [%f]", lY);
+  ROS_INFO("Linear Z = [%f]", lZ);
+  ROS_INFO("Angular X = [%f]", aX);
+  ROS_INFO("Angular Y = [%f]", aY);
+  ROS_INFO("Angular Z = [%f]", aZ);
 
-  ROS_INFO("Linear X = [%f]", msg->linear_acceleration.x);
-  ROS_INFO("Linear Y = [%f]", msg->linear_acceleration.y);
-  ROS_INFO("Linear Z = [%f]", msg->linear_acceleration.z);
+  myfile << std::to_string(msg->header.stamp.sec) + "." + std::to_string(msg->header.stamp.nsec) + ", ";
+  myfile << std::to_string(lX) + ", ";
+  myfile << std::to_string(lY) + ", ";
+  myfile << std::to_string(aX) + ", ";
+  myfile << std::to_string(lZ) + ", ";
+  myfile << std::to_string(aZ) + "\n" << std::flush;
+  myfile << std::to_string(aY) + ", ";
 
-  myfile << " \t \"Timestamp\" : { \n \t \t\"sec\" : "+ std::to_string(msg->header.stamp.sec) + ", \n \t \t \"nsec\" : "+ std::to_string(msg->header.stamp.nsec) + "\n \t }, \n";
-  myfile << " \t \"Linear\" : { \n \t \t\"x\" : "+ std::to_string(msg->linear_acceleration.x) + ", \n \t \t \"y\" : "+ std::to_string(msg->linear_acceleration.y) + ", \n \t \t \"z\" : "+ std::to_string(msg->linear_acceleration.z) + "\n \t }, \n";
-  myfile << " \t \"Angular\" : { \n \t \t\"x\" : "+ std::to_string(msg->angular_velocity.x) + ", \n \t \t \"y\" : "+ std::to_string(msg->angular_velocity.y) + ", \n \t \t \"z\" : "+ std::to_string(msg->angular_velocity.z) + "\n \t }, \n"  << std::flush;
-
-  ros::Duration(1).sleep();
+  //ros::Duration(1).sleep();
 }
 
 int main(int argc, char **argv)
@@ -74,17 +76,13 @@ int main(int argc, char **argv)
    */
   ros::NodeHandle n;
 
-  ROS_INFO("%s", "opening");
   double secs =ros::Time::now().toSec();
+  ROS_INFO("%s", "opening");
   std::string timeNow = std::to_string(secs);
 
-  myfile.open(timeNow + ".json");
-
+  myfile.open(timeNow + ".csv");
+  myfile << "Time [sec], Linear x, Linear y, Linear z, Angular x, Angular y, Angular z \n";
   ROS_INFO("%s", "Write");
-  myfile << "{\n";
-  myfile << " \"Date\" : \"" + timeNow + "\", \n";
-  myfile << " \"Type\" : \"xsens\", \n";
-  myfile << " \"Data\" : [ \n { \n";
 
   /**
    * The subscribe() call is how you tell ROS that you want to receive messages
@@ -112,7 +110,6 @@ int main(int argc, char **argv)
   ros::spin();
 
   ROS_INFO("%s", "close");
-  myfile << " } \n ] \n }";
   myfile.close();
 
   return 0;
