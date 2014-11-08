@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include "std_msgs/Header.h"
 #include "sensor_msgs/Imu.h"
 //#include "geometry_msgs/TwistStamped.h"
 #include <iostream>
@@ -34,10 +35,8 @@ void chatterCallback(const sensor_msgs::Imu::ConstPtr& msg)
   double lY = msg->linear_acceleration.y;
   double lZ = msg->linear_acceleration.z;
 
-  std::string a = std::to_string(42);
-
-  myfile << a;
-
+  ROS_INFO("Stamp sec= [%d]", msg->header.stamp.sec);
+  ROS_INFO("Stamp nsec= [%d]", msg->header.stamp.nsec);
   ROS_INFO("Angular X = [%f]", msg->angular_velocity.x);
   ROS_INFO("Angular Y = [%f]", msg->angular_velocity.y);
   ROS_INFO("Angular Z = [%f]", msg->angular_velocity.z);
@@ -46,8 +45,11 @@ void chatterCallback(const sensor_msgs::Imu::ConstPtr& msg)
   ROS_INFO("Linear Y = [%f]", msg->linear_acceleration.y);
   ROS_INFO("Linear Z = [%f]", msg->linear_acceleration.z);
 
-  ros::Duration(1).sleep();
+  myfile << " \t \"Timestamp\" : { \n \t \t\"sec\" : "+ std::to_string(msg->header.stamp.sec) + ", \n \t \t \"nsec\" : "+ std::to_string(msg->header.stamp.nsec) + "\n \t }, \n";
+  myfile << " \t \"Linear\" : { \n \t \t\"x\" : "+ std::to_string(msg->linear_acceleration.x) + ", \n \t \t \"y\" : "+ std::to_string(msg->linear_acceleration.y) + ", \n \t \t \"z\" : "+ std::to_string(msg->linear_acceleration.z) + "\n \t }, \n";
+  myfile << " \t \"Angular\" : { \n \t \t\"x\" : "+ std::to_string(msg->angular_velocity.x) + ", \n \t \t \"y\" : "+ std::to_string(msg->angular_velocity.y) + ", \n \t \t \"z\" : "+ std::to_string(msg->angular_velocity.z) + "\n \t }, \n"  << std::flush;
 
+  ros::Duration(1).sleep();
 }
 
 int main(int argc, char **argv)
@@ -73,9 +75,16 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   ROS_INFO("%s", "opening");
-  myfile.open("exampleros.txt");
+  double secs =ros::Time::now().toSec();
+  std::string timeNow = std::to_string(secs);
+
+  myfile.open(timeNow + ".json");
+
   ROS_INFO("%s", "Write");
-  myfile << "Writing this to a file.\n";
+  myfile << "{\n";
+  myfile << " \"Date\" : \"" + timeNow + "\", \n";
+  myfile << " \"Type\" : \"xsens\", \n";
+  myfile << " \"Data\" : [ \n { \n";
 
   /**
    * The subscribe() call is how you tell ROS that you want to receive messages
@@ -95,15 +104,16 @@ int main(int argc, char **argv)
   //ros::Subscriber sub2 = n.subscribe("velocity", 1000, chatterCallback2);
   ros::Subscriber sub = n.subscribe("imu/data", 1000, chatterCallback);
 
-  ROS_INFO("%s", "close");
-  myfile.close();
-
   /**
    * ros::spin() will enter a loop, pumping callbacks.  With this version, all
    * callbacks will be called from within this thread (the main one).  ros::spin()
    * will exit when Ctrl-C is pressed, or the node is shutdown by the master.
    */
   ros::spin();
+
+  ROS_INFO("%s", "close");
+  myfile << " } \n ] \n }";
+  myfile.close();
 
   return 0;
 }
