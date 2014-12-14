@@ -1,0 +1,26 @@
+<launch>
+# launch xsens_driver
+    <arg name="frame_id" default="/imu"/>
+
+    <arg name="frame_local" default="ENU"/>
+    <arg name="frame_local_imu" default="ENU"/>
+
+	<node pkg="xsens_driver" type="mtnode.py" name="xsens_driver" output="screen" >
+		<param name="frame_id" value="$(arg frame_id)"/>
+
+		<param name="frame_local" value="$(arg frame_local)"/>
+		<param name="frame_local_imu" value="$(arg frame_local_imu)"/>
+	</node>
+
+# Plot angular velocity
+	<node name="angular_velocity" type="rqt_plot" pkg="rqt_plot" args="/imu/data/angular_velocity/x:y:z" />
+
+# Plot linear acceleration
+	<node name="linear_acceleration" type="rqt_plot" pkg="rqt_plot" args="/imu/data/linear_acceleration/x:y:z" />
+
+# csv Recorder
+	<node name="xsens_csv" type="xsens_listen" pkg="xsens_sub" />
+
+# rqt_graph
+	<node name="rqt_graph" type="rqt_graph" pkg="rqt_graph" />
+</launch>
