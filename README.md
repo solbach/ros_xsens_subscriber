@@ -8,6 +8,7 @@ Furthermore, it starts rqt_plot instances to show current data graphically.
 * xsens driver are necessary [_LINK_](http://wiki.ros.org/action/fullsearch/xsens_driver?action=fullsearch&context=180&value=linkto%3A%22xsens_driver%22)
 * Tested on ROS Hydro on Ubuntu 12.04 and ROS Indigo on Ubuntu 14.04
 * Do the following steps to run it 
+	1. provide a proper output path to the csv recorder in line 22 of__ src/xsens_sub/launch/xsensPR.launch__
 	1. _$ catkin_make_
 	1. _$ sudo chmod a+rw /dev/ttyUSB0_
 	1. _$ source devel/setup.bash_

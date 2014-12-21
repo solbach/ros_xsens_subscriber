@@ -1,5 +1,5 @@
 <launch>
-# launch xsens_driver
+# xsens_driver
     <arg name="frame_id" default="/imu"/>
 
     <arg name="frame_local" default="ENU"/>
@@ -19,7 +19,7 @@
 	<node name="linear_acceleration" type="rqt_plot" pkg="rqt_plot" args="/imu/data/linear_acceleration/x:y:z" />
 
 # csv Recorder
-	<node name="xsens_csv" type="xsens_listen" pkg="xsens_sub" />
+	<node name="xsens_csv" type="xsens_listen" pkg="xsens_sub" args="/home/markus/" />
 
 # rqt_graph
 	<node name="rqt_graph" type="rqt_graph" pkg="rqt_graph" />
